@@ -19,6 +19,12 @@ PRIVATE_KEY_PATH = Path("student_private.pem")
 
 app = FastAPI(title="PKI-TOTP Auth Microservice")
 
+# Health check endpoint
+@app.get("/health")
+async def health_check():
+    """Health check endpoint to verify service is running"""
+    return {"status": "healthy", "service": "PKI-2FA"}
+
 
 class DecryptRequest(BaseModel):
     encrypted_seed: str
