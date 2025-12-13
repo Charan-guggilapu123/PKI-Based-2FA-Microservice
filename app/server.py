@@ -8,37 +8,18 @@ from typing import Optional
 import logging
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-LOG = logging.getLogger("uvicorn.error")
+logging.basicConfig(level=logging.INFO)
+LOG = logging.getLogger(__name__)
 
-# Log startup information
-LOG.info(f"Python version: {sys.version}")
-LOG.info(f"Working directory: {os.getcwd()}")
-LOG.info(f"PYTHONPATH: {os.environ.get('PYTHONPATH', 'Not set')}")
-LOG.info(f"DATA_DIR: {os.environ.get('DATA_DIR', 'Not set')}")
-
-# local utilities
-try:
-    from app.crypto_utils import decrypt_seed
-    from app.totp_utils import generate_totp_code, verify_totp_code, current_code_and_remaining
-    LOG.info("Successfully imported local utilities")
-except ImportError as e:
-    LOG.error(f"Failed to import local utilities: {e}", exc_info=True)
-    raise
+# Local utilities - use relative imports for clarity
+from .crypto_utils import decrypt_seed
+from .totp_utils import generate_totp_code, verify_totp_code, current_code_and_remaining
 
 DATA_DIR = Path(os.environ.get("DATA_DIR", "./data"))
 SEED_PATH = DATA_DIR / "seed.txt"
 PRIVATE_KEY_PATH = Path("student_private.pem")
 
 app = FastAPI(title="PKI-TOTP Auth Microservice")
-
-LOG.info("FastAPI app initialized successfully")
-LOG.info(f"Data directory: {DATA_DIR}")
-LOG.info(f"Seed file path: {SEED_PATH}")
-LOG.info(f"Private key path: {PRIVATE_KEY_PATH}")
 
 # Health check endpoint
 @app.get("/health")

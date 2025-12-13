@@ -1,28 +1,21 @@
 #!/usr/bin/env bash
+set -e
 
-# Set PYTHONPATH if not already set
+# Setup environment
 export PYTHONPATH="${PYTHONPATH:-/srv/app/vendor:/srv/app}"
 export PYTHONUNBUFFERED=1
-
-echo "=== Starting PKI-2FA Microservice ==="
-echo "Python: $(python --version)"
-echo "PYTHONPATH: $PYTHONPATH"
-echo "CWD: $(pwd)"
-echo "Files in /srv/app:"
-ls -la /srv/app/
+export DATA_DIR="${DATA_DIR:-/data}"
 
 # Create data directories
 mkdir -p /data /cron
-touch /cron/last_code.txt
+touch /cron/last_code.txt 2>/dev/null || true
 
-# Start cron in background
-echo "Starting cron..."
-service cron start 2>&1 >/dev/null || cron 2>&1 >/dev/null || true &
+# Start cron in background (optional - don't fail if it doesn't work)
+service cron start 2>/dev/null >/dev/null || cron 2>/dev/null >/dev/null || true &
 
-# Wait a bit for cron to settle
+# Give cron a moment to start
 sleep 1
 
-# Start uvicorn
-echo "Starting uvicorn..."
+# Start uvicorn from /srv/app
 cd /srv/app
 exec python -m uvicorn app.server:app --host 0.0.0.0 --port 8080 --log-level info
