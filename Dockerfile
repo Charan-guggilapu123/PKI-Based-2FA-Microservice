@@ -35,7 +35,8 @@ RUN mkdir -p /data /cron /srv/app && chmod 0755 /data /cron
 
 # Copy python packages installed in builder
 COPY --from=builder /app/vendor /srv/app/vendor
-ENV PYTHONPATH=/srv/app/vendor
+ENV PYTHONPATH=/srv/app/vendor:/srv/app
+ENV PYTHONUNBUFFERED=1
 
 # Copy app code, keys, scripts and cron config
 COPY --from=builder /app/app ./app
