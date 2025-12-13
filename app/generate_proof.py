@@ -28,7 +28,7 @@ def sign_message(message: str, private_key):
         msg_bytes,
         asympadding.PSS(
             mgf=asympadding.MGF1(hashes.SHA256()),
-            salt_length=asympadding.PSS.MAX_LENGTH
+            salt_length=asympadding.PSS.DIGEST_LENGTH
         ),
         hashes.SHA256()
     )
