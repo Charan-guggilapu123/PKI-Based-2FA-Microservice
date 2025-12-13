@@ -49,8 +49,8 @@ COPY --from=builder /etc/cron.d/totp_cron /etc/cron.d/totp_cron
 # Ensure cron file has correct permissions and LF line endings
 RUN chmod 0644 /etc/cron.d/totp_cron
 
-# Make run script executable
-RUN chmod +x ./scripts/run_cron.sh
+# Make scripts executable
+RUN chmod +x ./scripts/run_cron.sh ./scripts/run_uvicorn.sh ./scripts/entrypoint.sh
 
 # Expose API port
 EXPOSE 8080
@@ -58,6 +58,5 @@ EXPOSE 8080
 # Volumes (documented mount points)
 VOLUME ["/data", "/cron"]
 
-# Start cron (background) and then start uvicorn (foreground)
-# The run script writes last_code to /cron/last_code.txt
-CMD ["bash", "-lc", "service cron start || cron || true; ./scripts/run_uvicorn.sh"]
+# Start the entrypoint script which manages both cron and uvicorn
+ENTRYPOINT ["./scripts/entrypoint.sh"]
